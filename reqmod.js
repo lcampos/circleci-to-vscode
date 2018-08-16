@@ -4,17 +4,13 @@ const fs = require('fs');
 const path = require('path');
 
 // helper functions
-const ensureDirectoryExistence = (filePath) => {
+const ensureDirectoryExists = (filePath) => {
   const dirname = path.dirname(filePath);
   if (fs.existsSync(dirname)) {
     return true;
   }
-  ensureDirectoryExistence(dirname);
+  ensureDirectoryExists(dirname);
   fs.mkdirSync(dirname);
-};
-
-const getReleaseVersion = () => {
-  return ((navData.getDefaultAPIVersion() + 64) * 2).toFixed(1);
 };
 
 module.exports = {
@@ -52,30 +48,47 @@ module.exports = {
     }); //end Promise
   },
 
-  download: (filename, optsDownload) => {
-    console.log('--------- download ---------- ');
-    console.log('filename', filename);
-    console.log('optsDownload', optsDownload);
-    const tmpFilePath = path.resolve(__dirname, `tmp/${filename}.zip`);
-    console.log('tmpFilePath', tmpFilePath);
+  download: (fileName, optsDownload) => {
+    return new Promise((resolve, reject) => {
+      const tmpFilePath = path.resolve(__dirname, `tmp/${fileName}.zip`);
+      ensureDirectoryExists(tmpFilePath);
+      let file = fs.createWriteStream(tmpFilePath);
 
-    https.get(optsDownload, (res) => {
-      console.log('STATUS: ' + res.statusCode);
-      ensureDirectoryExistence(tmpFilePath);
-      var file = fs.createWriteStream(tmpFilePath);
-      res.on('data', (chunk) => {
-        // fs.appendFileSync(tmpFilePath, data)
-        /// console.log('being downloaded ...');
-        file.write(chunk);
+      let req = https.get(optsDownload, (res) => {
+        // console.log('STATUS: ' + res.statusCode);
+        // console.log(res.headers);
+        res.pipe(file);
+        file.on('finish', () => {
+          file.close();
+          console.log(fileName + ' downloaded to ' + tmpFilePath);
+          resolve([tmpFilePath, fileName]);
+        });
+
+        /*
+        res.on('data', (chunk) => {
+          file.write(chunk);
+        });
+
+        res.on('end', () => {
+           file.end();
+           console.log(fileName + ' downloaded to ' + tmpFilePath);
+           // extract(tmpFilePath, fileName);
+           resolve([tmpFilePath, fileName]);
+        })*/
       });
-      res.on('end', () => {
-         // const zip = new admZip(tmpFilePath)
-         // zip.extractAllTo('/Users/lcamposguajardo/vsixes/extracted/' + filename);
-         // fs.unlink(tmpFilePath)
-         file.end();
-         console.log(filename + ' downloaded to ' + tmpFilePath);
-      })
-    });
 
+      req.on('error', function(e) {
+        console.log('problems downloading a vsix: ' + e.message);
+        reject('problems downloading a vsix');
+      });
+      req.end();
+    }); //end Promise
+  },
+
+  extract: (filePath, fileName) => {
+    const zip = new admZip(filePath);
+    const extractedFilePath = path.resolve(__dirname, `tmp/extracted/${fileName}`);
+    ensureDirectoryExists(extractedFilePath);
+    zip.extractAllTo(extractedFilePath);
   }
 };

@@ -1,13 +1,16 @@
-const { https_get, download } = require('./reqmod');
+const { https_get, download, extract } = require('./reqmod');
 const program = require('commander');
 const co = require('co');
 const prompt = require('co-prompt');
 const chalk = require('chalk');
+const url = require('url');
 
-const CIRCLE_TOKEN = '';
-const vcs_type = '';
-const username = '';
-const project = '';
+// config.
+const data = require('./config.json');
+const CIRCLE_TOKEN = data.CIRCLE_TOKEN;
+const vcs_type = data.vcs_type;
+const username = data.username;
+const project = data.project;
 // const build_num = '';
 
 program
@@ -30,31 +33,38 @@ program
     };
 
     try {
-      let vsixUrls = [];
       // get the artifact urls from circlci.
       https_get(opts).then((jsonData) => {
-        // console.log(jsonData);
         if (jsonData.length > 0) {
           console.log(chalk.bold.cyan('VSIXs to be downloaded : ') + jsonData.length);
         }
 
         for (i in jsonData) {
-          console.log(jsonData[i].path.replace('home/circleci/project/extensions/', ''));
-          vsixUrls.push(jsonData[i].url);
+          const vsixName = jsonData[i].path.replace('home/circleci/project/extensions/', '').replace('.vsix', '');
+
+          console.log('Processing vsix : ' + vsixName);
+          const artifactUrl = new url.parse(jsonData[i].url);
+
+          const optsDownload = {
+            host: artifactUrl.host,
+            path: artifactUrl.pathname,
+            method: 'GET'
+          }
+
+          download(vsixName, optsDownload).then((resultArray) => {
+            extract(resultArray[0], resultArray[1]);
+          }).catch((err) => {
+            console.error(chalk.red(err));
+          });
         }
-        console.log('');
-        const optsDownload = {
-          host: '1593-95021029-gh.circle-artifacts.com',
-          path: `/0/home/circleci/project/extensions/salesforcedx-vscode-43.11.0.vsix?circle-token=${CIRCLE_TOKEN}`,
-          method: 'GET'
-        }
-        download('salesforcedx-vscode-43.11.0', optsDownload);
+
         // exit the program.
         // process.exit(0);
       }).catch((err) => {
         console.error(chalk.red(err));
         process.exit(1);
-      })
+      });
+
     } catch (err) {
       console.error(chalk.red(err));
     }
