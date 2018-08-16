@@ -1,0 +1,24 @@
+{
+  "name": "circleci-downloader",
+  "version": "1.0.0",
+  "description": "Download artifacts from circle ci",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./index.js",
+    "test": "echo \"No tests\" && exit 1"
+  },
+  "keywords": [
+    "circleci",
+    "artifacts",
+    "download"
+  ],
+  "author": "Luis Campos Guajardo",
+  "license": "ISC",
+  "dependencies": {
+    "adm-zip": "^0.4.11",
+    "chalk": "^2.4.1",
+    "co": "^4.6.0",
+    "co-prompt": "^1.0.0",
+    "commander": "^2.17.1"
+  }
+}
