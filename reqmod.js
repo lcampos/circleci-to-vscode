@@ -1,7 +1,12 @@
 const https = require('https');
 const admZip = require('adm-zip');
 const fs = require('fs');
+const fse = require('fs-extra');
 const path = require('path');
+const os = require('os');
+
+// constants
+const PUBLISHER = 'salesforce';
 
 // helper functions
 const ensureDirectoryExists = (filePath) => {
@@ -11,6 +16,35 @@ const ensureDirectoryExists = (filePath) => {
   }
   ensureDirectoryExists(dirname);
   fs.mkdirSync(dirname);
+};
+
+const installExtension = (originExtractPath, extensionName) => {
+  const vscodeExtDirRoot = `${os.homedir()}/.vscode/extensions`;
+  const extensionInstallDir = `${vscodeExtDirRoot}/${PUBLISHER}.${extensionName}`;
+
+  // create new dir for extension to be installed
+  ensureDirectoryExists(extensionInstallDir);
+
+  // move extension from cli to vscode dirs
+  const originExtension = `${originExtractPath}/extension`;
+
+  // Move extension contents.
+  fse.move(originExtension, extensionInstallDir, {overwrite:true})
+  .then(() => {
+    // Move extension manifest.
+    const originExtensionManifest = `${originExtractPath}/extension.vsixmanifest`;
+
+    fse.move(originExtensionManifest, extensionInstallDir + '/.vsixmanifest', {overwrite:true})
+    .then(() => {
+      console.log(`Successfully installed extension ${extensionName}`);
+    })
+    .catch(err => {
+      console.error(err);
+    })
+  })
+  .catch(err => {
+    console.error(err);
+  });
 };
 
 module.exports = {
@@ -60,21 +94,9 @@ module.exports = {
         res.pipe(file);
         file.on('finish', () => {
           file.close();
-          console.log(fileName + ' downloaded to ' + tmpFilePath);
+          // console.log(fileName + ' downloaded to ' + tmpFilePath);
           resolve([tmpFilePath, fileName]);
         });
-
-        /*
-        res.on('data', (chunk) => {
-          file.write(chunk);
-        });
-
-        res.on('end', () => {
-           file.end();
-           console.log(fileName + ' downloaded to ' + tmpFilePath);
-           // extract(tmpFilePath, fileName);
-           resolve([tmpFilePath, fileName]);
-        })*/
       });
 
       req.on('error', function(e) {
@@ -89,6 +111,11 @@ module.exports = {
     const zip = new admZip(filePath);
     const extractedFilePath = path.resolve(__dirname, `tmp/extracted/${fileName}`);
     ensureDirectoryExists(extractedFilePath);
-    zip.extractAllTo(extractedFilePath);
+    try {
+      zip.extractAllTo(extractedFilePath);
+    } catch (e) {
+      console.log( 'Caught exception: ', e );
+    }
+    installExtension(extractedFilePath, fileName);
   }
 };
