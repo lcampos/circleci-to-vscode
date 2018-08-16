@@ -1,19 +1,26 @@
 {
-  "name": "circleci-downloader",
-  "version": "1.0.0",
-  "description": "Download artifacts from circle ci",
+  "name": "circleci-to-vscode",
+  "version": "0.1.0",
+  "description": "Download artifacts from circle ci and install them as vscode extensions",
   "main": "index.js",
   "scripts": {
-    "start": "node ./index.js",
     "test": "echo \"No tests\" && exit 1"
   },
   "keywords": [
     "circleci",
     "artifacts",
-    "download"
+    "download",
+    "vsix"
   ],
   "author": "Luis Campos Guajardo",
-  "license": "ISC",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lcampos/circleci-to-vscode.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lcampos/circleci-to-vscode/issues"
+  },
   "dependencies": {
     "adm-zip": "^0.4.11",
     "chalk": "^2.4.1",
@@ -22,5 +29,8 @@
   },
   "engines": {
     "node": "8.9.4"
+  },
+  "bin": {
+    "ctv": "./index.js"
   }
 }

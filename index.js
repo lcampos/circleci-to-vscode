@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const { https_get, download, extract, installExtension } = require('./reqmod');
 const program = require('commander');
 const chalk = require('chalk');
@@ -45,7 +46,7 @@ try {
     for (i in jsonData) {
       const vsixName = jsonData[i].path.replace('home/circleci/project/extensions/', '').replace('.vsix', '');
 
-      console.log('Processing vsix : ' + vsixName);
+      console.log(chalk.bold.yellow('Processing vsix : ') + vsixName);
       const artifactUrl = new url.parse(jsonData[i].url);
 
       const optsDownload = {
@@ -60,9 +61,6 @@ try {
         console.error(chalk.red(err));
       });
     }
-
-    // exit the program.
-    // process.exit(0);
   }).catch((err) => {
     console.error(chalk.red(err));
     process.exit(1);

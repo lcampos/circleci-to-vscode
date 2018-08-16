@@ -4,6 +4,7 @@ const fs = require('fs');
 const fse = require('fs-extra');
 const path = require('path');
 const os = require('os');
+const chalk = require('chalk');
 
 // constants
 const PUBLISHER = 'salesforce';
@@ -36,14 +37,15 @@ const installExtension = (originExtractPath, extensionName) => {
 
     fse.move(originExtensionManifest, extensionInstallDir + '/.vsixmanifest', {overwrite:true})
     .then(() => {
-      console.log(`Successfully installed extension ${extensionName}`);
+      console.log(chalk.bold.cyan(`Successfully installed extension ${extensionName}`));
+      console.log();
     })
     .catch(err => {
-      console.error(err);
+      console.error(chalk.red(`Error installing ${extensionName} : ${err}`));
     })
   })
   .catch(err => {
-    console.error(err);
+    console.error(chalk.red(err));
   });
 };
 
@@ -53,8 +55,6 @@ module.exports = {
       // Set up the request.
       let respData = '';
       const req = https.request(opts, (res) => {
-        console.log('STATUS: ' + res.statusCode);
-        // console.log('HEADERS: ' + JSON.stringify(res.headers));
         res.setEncoding('utf8');
         res.on('data', (chunk) => {
           respData += chunk;
@@ -71,7 +71,6 @@ module.exports = {
       });
 
       req.on('error', function(e) {
-        console.log('problems with request: ' + e.message);
         reject('problems with request');
       });
 
@@ -89,18 +88,14 @@ module.exports = {
       let file = fs.createWriteStream(tmpFilePath);
 
       let req = https.get(optsDownload, (res) => {
-        // console.log('STATUS: ' + res.statusCode);
-        // console.log(res.headers);
         res.pipe(file);
         file.on('finish', () => {
           file.close();
-          // console.log(fileName + ' downloaded to ' + tmpFilePath);
           resolve([tmpFilePath, fileName]);
         });
       });
 
       req.on('error', function(e) {
-        console.log('problems downloading a vsix: ' + e.message);
         reject('problems downloading a vsix');
       });
       req.end();
@@ -114,7 +109,7 @@ module.exports = {
     try {
       zip.extractAllTo(extractedFilePath);
     } catch (e) {
-      console.log( 'Caught exception: ', e );
+      console.error(chalk.red(`Exception while installing ${fileName} : ${e}`));
     }
     installExtension(extractedFilePath, fileName);
   }
