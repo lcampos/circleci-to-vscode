@@ -2,5 +2,6 @@
   "CIRCLE_TOKEN": "<my token>",
   "vcs_type": "<github or bitbucket>",
   "username": "<circle ci username>",
-  "project": "<project name>"
+  "project": "<project name>",
+  "vscode_publisher": "<vscode publisher>"
 }

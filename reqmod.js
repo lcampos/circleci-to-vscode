@@ -6,8 +6,9 @@ const path = require('path');
 const os = require('os');
 const chalk = require('chalk');
 
-// constants
-const PUBLISHER = 'salesforce';
+// config.
+const data = require('./config.json');
+const PUBLISHER = data.vscode_publisher;
 
 // helper functions
 const ensureDirectoryExists = (filePath) => {
@@ -65,6 +66,7 @@ module.exports = {
           if (res.statusCode === 200) {
             resolve(JSON.parse(respData));
           } else {
+            // console.log('seems it was not 200, response = ', respData);
             reject('request status = ' + res.statusCode);
           }
         }); // end

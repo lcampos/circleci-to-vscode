@@ -14,16 +14,45 @@ const project = data.project;
 let buildValue;
 
 program
-.version('0.1.0')
-.arguments('<build>')
+.version('0.1.1')
+.arguments('<build>') // if nothing is set, the whole thing fails
 .action(function(build) {
+  console.log('action piece, build ', build);
   buildValue = build;
 })
 .parse(process.argv);
 
-if (typeof buildValue === 'undefined') {
+const last_builds_opts = {
+  host: 'circleci.com',
+  path: encodeURI(`/api/v1.1/project/${vcs_type}/${username}/${project}?circle-token=${CIRCLE_TOKEN}&limit=10&offset=0&filter=completed`),
+  method: 'GET',
+  headers: {
+    Accept: 'application/json'
+  }
+};
+
+if (typeof buildValue === 'undefined' || buildValue === '5') {
    console.error(chalk.red('You need to provide a circleci build run number.'));
-   process.exit(1);
+
+   console.log('last_builds_opts: ', last_builds_opts);
+   // get last success builds
+   https_get(last_builds_opts).then((jsonData) => {
+     if (jsonData.length > 0) {
+       console.log('----- Last 10 successful circleci builds ------');
+       // iterate and print successful build nums
+       for (i in jsonData) {
+         const buildNum = jsonData[i].build_num;
+         console.log('----- Build #: ' + buildNum);
+         console.log('----- Branch: ' + jsonData[i].branch);
+         console.log('----- Subject: ' + jsonData[i].subject);
+         console.log();
+       }
+     }
+     process.exit(1);
+   }).catch((err) => {
+     console.error(chalk.red(err));
+     process.exit(1);
+   });
 }
 
 // https://circleci.com/docs/2.0/artifacts/#downloading-all-artifacts-for-a-build-on-circleci
