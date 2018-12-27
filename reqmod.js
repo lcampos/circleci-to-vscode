@@ -11,7 +11,7 @@ const data = require('./config.json');
 const PUBLISHER = data.vscode_publisher;
 
 // helper functions
-const ensureDirectoryExists = (filePath) => {
+const ensureDirectoryExists = filePath => {
   const dirname = path.dirname(filePath);
   if (fs.existsSync(dirname)) {
     return true;
@@ -31,33 +31,41 @@ const installExtension = (originExtractPath, extensionName) => {
   const originExtension = `${originExtractPath}/extension`;
 
   // Move extension contents.
-  fse.move(originExtension, extensionInstallDir, {overwrite:true})
-  .then(() => {
-    // Move extension manifest.
-    const originExtensionManifest = `${originExtractPath}/extension.vsixmanifest`;
-
-    fse.move(originExtensionManifest, extensionInstallDir + '/.vsixmanifest', {overwrite:true})
+  fse
+    .move(originExtension, extensionInstallDir, { overwrite: true })
     .then(() => {
-      console.log(chalk.bold.cyan(`Successfully installed extension ${extensionName}`));
-      console.log();
+      // Move extension manifest.
+      const originExtensionManifest = `${originExtractPath}/extension.vsixmanifest`;
+
+      fse
+        .move(originExtensionManifest, extensionInstallDir + '/.vsixmanifest', {
+          overwrite: true
+        })
+        .then(() => {
+          console.log(
+            chalk.bold.cyan(`Successfully installed extension ${extensionName}`)
+          );
+          console.log();
+        })
+        .catch(err => {
+          console.error(
+            chalk.red(`Error installing ${extensionName} : ${err}`)
+          );
+        });
     })
     .catch(err => {
-      console.error(chalk.red(`Error installing ${extensionName} : ${err}`));
-    })
-  })
-  .catch(err => {
-    console.error(chalk.red(err));
-  });
+      console.error(chalk.red(err));
+    });
 };
 
 module.exports = {
-  https_get: (opts) => {
+  https_get: opts => {
     return new Promise((resolve, reject) => {
       // Set up the request.
       let respData = '';
-      const req = https.request(opts, (res) => {
+      const req = https.request(opts, res => {
         res.setEncoding('utf8');
-        res.on('data', (chunk) => {
+        res.on('data', chunk => {
           respData += chunk;
         });
 
@@ -89,7 +97,7 @@ module.exports = {
       ensureDirectoryExists(tmpFilePath);
       let file = fs.createWriteStream(tmpFilePath);
 
-      let req = https.get(optsDownload, (res) => {
+      let req = https.get(optsDownload, res => {
         res.pipe(file);
         file.on('finish', () => {
           file.close();
@@ -106,7 +114,10 @@ module.exports = {
 
   extract: (filePath, fileName) => {
     const zip = new admZip(filePath);
-    const extractedFilePath = path.resolve(__dirname, `tmp/extracted/${fileName}`);
+    const extractedFilePath = path.resolve(
+      __dirname,
+      `tmp/extracted/${fileName}`
+    );
     ensureDirectoryExists(extractedFilePath);
     try {
       zip.extractAllTo(extractedFilePath);
