@@ -1,0 +1,27 @@
+{
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module"
+  },
+  "extends": ["eslint:recommended"],
+  "env": {
+    "node": true
+  },
+  "rules": {
+    "semi": 2,
+    "eqeqeq": "error",
+    "curly": "error",
+    "quotes": ["error", "single"],
+    "no-console": "error",
+    "callback-return": "error",
+    "global-require": "error",
+    "no-mixed-requires": "error",
+    "no-path-concat": "error",
+    "no-new-require": "error",
+    "camelcase": "error",
+    "no-var": "error",
+    "prefer-arrow-callback": "error",
+    "prefer-const": "error",
+    "sort-imports": "error"
+  }
+}

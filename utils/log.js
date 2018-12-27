@@ -1,4 +1,4 @@
-// log.js
+/* eslint-disable no-console */
 const chalk = require('chalk');
 
 const info = data => {

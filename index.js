@@ -1,18 +1,18 @@
 #!/usr/bin/env node
-const { https_get, download, extract, installExtension } = require('./reqmod');
+// const { https_get, download, extract, installExtension } = require('./reqmod');
 const { info, error } = require('./utils/log');
 const fs = require('fs');
 const program = require('commander');
-const url = require('url');
+// const url = require('url');
 
 // config.
-const data = require('./config.json');
-const CIRCLE_TOKEN = data.CIRCLE_TOKEN;
+// const data = require('./config.json');
+/* const CIRCLE_TOKEN = data.CIRCLE_TOKEN;
 const vcs_type = data.vcs_type;
 const username = data.username;
 const project = data.project;
 
-let buildValue;
+let buildValue; */
 
 program.version('0.1.1');
 /* .arguments('<build>') // if nothing is set, the whole thing fails
@@ -36,7 +36,7 @@ program
   )
   .option('-p, --project', 'The name of the target VCS repository.')
   .option('-m, --publisher', 'VSCode marketplace publisher name.')
-  .action(function(env, options) {
+  .action((env, options) => {
     try {
       if (!options.token) {
         throw new Error('--token is required');
@@ -44,7 +44,7 @@ program
 
       const vcsType = options.vcs_type || 'github';
       if (!options.vcs_type) {
-        console.log('Defaulting version control system setting to github');
+        info('Defaulting version control system setting to github');
       }
 
       if (!options.username) {
@@ -77,7 +77,7 @@ program
 
 program.parse(process.argv);
 
-console.log('stuff');
+info('stuff');
 /*
 const last_builds_opts = {
   host: 'circleci.com',

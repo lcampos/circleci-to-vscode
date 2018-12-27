@@ -4,8 +4,9 @@
   "description": "Download artifacts from circle ci and install them as vscode extensions",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"No tests\" && exit 1",
-    "format": "prettier --config .prettierrc --write './*.{js,json}' './utils/*.js'"
+    "format": "prettier --config .prettierrc --write './*.{js,json}' './utils/*.js'",
+    "lint": "eslint . --config=.eslintrc.json",
+    "test": "echo \"No tests\" && exit 1"
   },
   "keywords": [
     "circleci",

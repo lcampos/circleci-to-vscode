@@ -4,7 +4,7 @@ const fs = require('fs');
 const fse = require('fs-extra');
 const path = require('path');
 const os = require('os');
-const chalk = require('chalk');
+const { info, error } = require('./utils/log');
 
 // config.
 const data = require('./config.json');
@@ -42,19 +42,14 @@ const installExtension = (originExtractPath, extensionName) => {
           overwrite: true
         })
         .then(() => {
-          console.log(
-            chalk.bold.cyan(`Successfully installed extension ${extensionName}`)
-          );
-          console.log();
+          info(`Successfully installed extension ${extensionName}`);
         })
         .catch(err => {
-          console.error(
-            chalk.red(`Error installing ${extensionName} : ${err}`)
-          );
+          error(`Error installing ${extensionName} : ${err}`);
         });
     })
     .catch(err => {
-      console.error(chalk.red(err));
+      error(err.message);
     });
 };
 
@@ -80,7 +75,8 @@ module.exports = {
         }); // end
       });
 
-      req.on('error', function(e) {
+      req.on('error', e => {
+        error(`Error on https request : ${e.message}`);
         reject('problems with request');
       });
 
@@ -95,9 +91,9 @@ module.exports = {
     return new Promise((resolve, reject) => {
       const tmpFilePath = path.resolve(__dirname, `tmp/${fileName}.zip`);
       ensureDirectoryExists(tmpFilePath);
-      let file = fs.createWriteStream(tmpFilePath);
+      const file = fs.createWriteStream(tmpFilePath);
 
-      let req = https.get(optsDownload, res => {
+      const req = https.get(optsDownload, res => {
         res.pipe(file);
         file.on('finish', () => {
           file.close();
@@ -105,7 +101,8 @@ module.exports = {
         });
       });
 
-      req.on('error', function(e) {
+      req.on('error', e => {
+        error(`Error on vsix download : ${e.message}`);
         reject('problems downloading a vsix');
       });
       req.end();
@@ -122,7 +119,7 @@ module.exports = {
     try {
       zip.extractAllTo(extractedFilePath);
     } catch (e) {
-      console.error(chalk.red(`Exception while installing ${fileName} : ${e}`));
+      error(`Exception while installing ${fileName} : ${e}`);
     }
     installExtension(extractedFilePath, fileName);
   }
