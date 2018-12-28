@@ -1,5 +1,5 @@
-const log = require('./utils/log');
-const { setup } = require('./cli-setup');
+const log = require('../utils/log');
+const { setup } = require('../cli-setup');
 const fs = require('fs');
 
 describe('Setup command', () => {

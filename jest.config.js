@@ -97,7 +97,7 @@ module.exports = {
   // restoreMocks: false,
 
   // The root directory that Jest should scan for tests and modules within
-  // rootDir: null,
+  rootDir: '.',
 
   // A list of paths to directories that Jest should use to search for files in
   // roots: [
@@ -137,7 +137,7 @@ module.exports = {
   // ],
 
   // The regexp pattern Jest uses to detect test files
-  // testRegex: "",
+  testRegex: 'test/*.js',
 
   // This option allows the use of a custom results processor
   // testResultsProcessor: null,
