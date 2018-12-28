@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const program = require('commander');
 const { setup } = require('./cli-setup');
+const { installVsix } = require('./cli-install-vsix');
 
 program.version('0.1.1');
 program
@@ -19,6 +20,15 @@ program
   .option('-m, --publisher', 'VSCode marketplace publisher name.')
   .action((env, options) => {
     setup(options);
+  });
+
+program
+  .command('install <build>')
+  .description('Install vsix files from CircleCi build number')
+  .option('-i, --insiders', 'CircleCI personal API token you created')
+  .action((build, options) => {
+    const isInsiders = options.insiders ? true : false;
+    installVsix(isInsiders, build);
   });
 
 program.parse(process.argv);

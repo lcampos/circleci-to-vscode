@@ -4,11 +4,8 @@ const fs = require('fs');
 const fse = require('fs-extra');
 const path = require('path');
 const os = require('os');
-const { info, error } = require('./utils/log');
-
-// config.
-const data = require('./config.json');
-const PUBLISHER = data.vscode_publisher;
+const { info, error } = require('./log');
+const { readConfigFile } = require('./configFile');
 
 // helper functions
 const ensureDirectoryExists = filePath => {
@@ -22,7 +19,8 @@ const ensureDirectoryExists = filePath => {
 
 const installExtension = (originExtractPath, extensionName) => {
   const vscodeExtDirRoot = `${os.homedir()}/.vscode/extensions`;
-  const extensionInstallDir = `${vscodeExtDirRoot}/${PUBLISHER}.${extensionName}`;
+  const publisher = readConfigFile().publisher;
+  const extensionInstallDir = `${vscodeExtDirRoot}/${publisher}.${extensionName}`;
 
   // create new dir for extension to be installed
   ensureDirectoryExists(extensionInstallDir);
@@ -54,7 +52,7 @@ const installExtension = (originExtractPath, extensionName) => {
 };
 
 module.exports = {
-  https_get: opts => {
+  httpsGet: opts => {
     return new Promise((resolve, reject) => {
       // Set up the request.
       let respData = '';
@@ -89,7 +87,7 @@ module.exports = {
 
   download: (fileName, optsDownload) => {
     return new Promise((resolve, reject) => {
-      const tmpFilePath = path.resolve(__dirname, `tmp/${fileName}.zip`);
+      const tmpFilePath = path.resolve(__dirname, `../tmp/${fileName}.zip`);
       ensureDirectoryExists(tmpFilePath);
       const file = fs.createWriteStream(tmpFilePath);
 
