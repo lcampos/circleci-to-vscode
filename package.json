@@ -6,7 +6,7 @@
   "scripts": {
     "format": "prettier --config .prettierrc --write './*.{js,json}' './utils/*.js'",
     "lint": "eslint . --config=.eslintrc.json",
-    "test": "echo \"No tests\" && exit 1"
+    "test": "jest --config ./jest.config.js"
   },
   "keywords": [
     "circleci",
@@ -30,8 +30,12 @@
     "fs-extra": "^7.0.0"
   },
   "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-jest": "^23.6.0",
     "eslint": "^5.8.0",
-    "prettier": "1.15.3"
+    "jest": "^23.6.0",
+    "prettier": "1.15.3",
+    "regenerator-runtime": "^0.13.1"
   },
   "engines": {
     "node": "8.9.4"

@@ -1,27 +1,8 @@
 #!/usr/bin/env node
-// const { https_get, download, extract, installExtension } = require('./reqmod');
-const { info, error } = require('./utils/log');
-const fs = require('fs');
 const program = require('commander');
-// const url = require('url');
-
-// config.
-// const data = require('./config.json');
-/* const CIRCLE_TOKEN = data.CIRCLE_TOKEN;
-const vcs_type = data.vcs_type;
-const username = data.username;
-const project = data.project;
-
-let buildValue; */
+const { setup } = require('./cli-setup');
 
 program.version('0.1.1');
-/* .arguments('<build>') // if nothing is set, the whole thing fails
-.action(function(build) {
-  console.log('action piece, build ', build);
-  buildValue = build;
-})
-.parse(process.argv); */
-
 program
   .command('setup [env]')
   .description('Create the configuration needed to run this cli')
@@ -37,47 +18,11 @@ program
   .option('-p, --project', 'The name of the target VCS repository.')
   .option('-m, --publisher', 'VSCode marketplace publisher name.')
   .action((env, options) => {
-    try {
-      if (!options.token) {
-        throw new Error('--token is required');
-      }
-
-      const vcsType = options.vcs_type || 'github';
-      if (!options.vcs_type) {
-        info('Defaulting version control system setting to github');
-      }
-
-      if (!options.username) {
-        throw new Error('--username is required');
-      }
-
-      if (!options.project) {
-        throw new Error('--project is required');
-      }
-
-      if (!options.publisher) {
-        throw new Error('--publisher is required');
-      }
-
-      const inputConfig = {
-        CIRCLE_TOKEN: options.token,
-        vcs_type: vcsType,
-        username: options.username,
-        project: options.project,
-        vscode_publisher: options.publisher
-      };
-
-      fs.writeFileSync('./config.json', JSON.stringify(inputConfig, null, 2));
-    } catch (e) {
-      error(`Error while creating the cli configuration : ${e.message}`);
-      process.exit(1);
-    }
-    info('The cli was successfully configured.');
+    setup(options);
   });
 
 program.parse(process.argv);
 
-info('stuff');
 /*
 const last_builds_opts = {
   host: 'circleci.com',
