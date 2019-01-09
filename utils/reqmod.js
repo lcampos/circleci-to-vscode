@@ -17,9 +17,11 @@ const ensureDirectoryExists = filePath => {
   fs.mkdirSync(dirname);
 };
 
-const installExtension = (originExtractPath, extensionName) => {
-  const vscodeExtDirRoot = `${os.homedir()}/.vscode/extensions`;
-  const publisher = readConfigFile().publisher;
+const installExtension = (originExtractPath, extensionName, isInsiders) => {
+  const vscodeExtDirRoot = isInsiders
+    ? `${os.homedir()}/.vscode-insiders/extensions`
+    : `${os.homedir()}/.vscode/extensions`;
+  const publisher = readConfigFile().vscode_publisher;
   const extensionInstallDir = `${vscodeExtDirRoot}/${publisher}.${extensionName}`;
 
   // create new dir for extension to be installed
@@ -107,7 +109,7 @@ module.exports = {
     }); //end Promise
   },
 
-  extract: (filePath, fileName) => {
+  extract: (filePath, fileName, isInsiders) => {
     const zip = new admZip(filePath);
     const extractedFilePath = path.resolve(
       __dirname,
@@ -119,6 +121,6 @@ module.exports = {
     } catch (e) {
       error(`Exception while installing ${fileName} : ${e}`);
     }
-    installExtension(extractedFilePath, fileName);
+    installExtension(extractedFilePath, fileName, isInsiders);
   }
 };
