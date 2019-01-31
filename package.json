@@ -1,6 +1,6 @@
 {
   "name": "circleci-to-vscode",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Download artifacts from circle ci and install them as vscode extensions",
   "main": "index.js",
   "scripts": {
