@@ -24,18 +24,34 @@ Once done with the configuration section we can start running the tool to downlo
 
 Run the cli by providing a circleci build number that contains artifacts.
 ```
-$ ctv <build_number>
+$ ctv install <build_number>
 ```
 
 You'll start seeing output on the terminal indicating the progress of the operation
 
 ```
-$ ctv 1111
+$ ctv install 1111
 VSIXs to be downloaded : 1
 Processing vsix : <artifact name>
 Successfully installed extension <extension name>
 
 ```
+
+## Commands
+```
+$ ctv install <build_number>
+```
+Command to install vsix files to Visual Studio Code. Use `-i` or `--insiders` flag to get the vsix installed in Visual Studio Code Insiders.
+
+```
+$ ctv setup -t <circleci_token> -v <github_or_bitbucket> -u <circleci_username> -p <circleci_project> -m <vscode_publisher_name>
+```
+Command to create the configuration needed to run this cli. Output is the `config.json` file described in [Configuration](#configuration) section.
+
+```
+$ ctv <command> -h
+```
+Help flag will give you a description of the commands functionality and available flags.
 
 ## Development
 

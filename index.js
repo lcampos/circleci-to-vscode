@@ -1,71 +1,34 @@
 #!/usr/bin/env node
-const { https_get, download, extract, installExtension } = require('./reqmod');
 const program = require('commander');
-const chalk = require('chalk');
-const url = require('url');
+const { setup } = require('./cli-setup');
+const { installVsix } = require('./cli-install-vsix');
 
-// config.
-const data = require('./config.json');
-const CIRCLE_TOKEN = data.CIRCLE_TOKEN;
-const vcs_type = data.vcs_type;
-const username = data.username;
-const project = data.project;
-
-let buildValue;
-
+program.version('0.2.0');
 program
-.version('0.1.0')
-.arguments('<build>')
-.action(function(build) {
-  buildValue = build;
-})
-.parse(process.argv);
-
-if (typeof buildValue === 'undefined') {
-   console.error(chalk.red('You need to provide a circleci build run number.'));
-   process.exit(1);
-}
-
-// https://circleci.com/docs/2.0/artifacts/#downloading-all-artifacts-for-a-build-on-circleci
-const opts = {
-  host: 'circleci.com',
-  path: `/api/v1.1/project/${vcs_type}/${username}/${project}/${buildValue}/artifacts?circle-token=${CIRCLE_TOKEN}`,
-  method: 'GET',
-  headers: {
-    Accept: 'application/json'
-  }
-};
-
-try {
-  // get the artifact urls from circlci.
-  https_get(opts).then((jsonData) => {
-    if (jsonData.length > 0) {
-      console.log(chalk.bold.cyan('VSIXs to be downloaded : ') + jsonData.length);
-    }
-
-    for (i in jsonData) {
-      const vsixName = jsonData[i].path.replace('home/circleci/project/extensions/', '').replace('.vsix', '');
-
-      console.log(chalk.bold.yellow('Processing vsix : ') + vsixName);
-      const artifactUrl = new url.parse(jsonData[i].url);
-
-      const optsDownload = {
-        host: artifactUrl.host,
-        path: artifactUrl.pathname,
-        method: 'GET'
-      }
-
-      download(vsixName, optsDownload).then((resultArray) => {
-        extract(resultArray[0], resultArray[1]);
-      }).catch((err) => {
-        console.error(chalk.red(err));
-      });
-    }
-  }).catch((err) => {
-    console.error(chalk.red(err));
-    process.exit(1);
+  .command('setup [env]')
+  .description('Create the configuration needed to run this cli')
+  .option('-t, --token <t>', 'CircleCI personal API token you created')
+  .option(
+    '-v, --vcs_type [v]',
+    'The version control system (VCS) you are using. Either github or bitbucket.'
+  )
+  .option(
+    '-u, --username <u>',
+    'The VCS project account username or organization name for the target project. Located at the top left of the screen in the CircleCI application.'
+  )
+  .option('-p, --project <p>', 'The name of the target VCS repository.')
+  .option('-m, --publisher <m>', 'VSCode marketplace publisher name.')
+  .action((env, options) => {
+    setup(options);
   });
 
-} catch (err) {
-  console.error(chalk.red(err));
-}
+program
+  .command('install <build>')
+  .description('Install vsix files from CircleCi build number')
+  .option('-i, --insiders', 'Install the extension for VSCode Insiders')
+  .action((build, options) => {
+    const isInsiders = options.insiders ? true : false;
+    installVsix(isInsiders, build);
+  });
+
+program.parse(process.argv);
