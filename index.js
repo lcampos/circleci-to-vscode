@@ -7,17 +7,17 @@ program.version('0.2.0');
 program
   .command('setup [env]')
   .description('Create the configuration needed to run this cli')
-  .option('-t, --token', 'CircleCI personal API token you created')
+  .option('-t, --token <t>', 'CircleCI personal API token you created')
   .option(
-    '-v, --vcs_type',
+    '-v, --vcs_type [v]',
     'The version control system (VCS) you are using. Either github or bitbucket.'
   )
   .option(
-    '-u, --username',
+    '-u, --username <u>',
     'The VCS project account username or organization name for the target project. Located at the top left of the screen in the CircleCI application.'
   )
-  .option('-p, --project', 'The name of the target VCS repository.')
-  .option('-m, --publisher', 'VSCode marketplace publisher name.')
+  .option('-p, --project <p>', 'The name of the target VCS repository.')
+  .option('-m, --publisher <m>', 'VSCode marketplace publisher name.')
   .action((env, options) => {
     setup(options);
   });

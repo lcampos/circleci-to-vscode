@@ -2,6 +2,7 @@ const { info, error } = require('./utils/log');
 const fs = require('fs');
 
 const setup = options => {
+  console.log(options.token);
   try {
     if (!options.token) {
       throw new Error('--token is required');
