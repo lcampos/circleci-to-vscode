@@ -4,6 +4,7 @@
   "description": "Download artifacts from circle ci and install them as vscode extensions",
   "main": "index.js",
   "scripts": {
+    "clean": "git clean -xfd -e config.json",
     "format": "prettier --config .prettierrc --write './*.{js,json}' './utils/*.js'",
     "lint": "eslint . --config=.eslintrc.json",
     "test": "jest --config ./jest.config.js"
@@ -38,7 +39,7 @@
     "regenerator-runtime": "^0.13.1"
   },
   "engines": {
-    "node": "8.9.4"
+    "node": "^10.2.0"
   },
   "bin": {
     "ctv": "./index.js"
