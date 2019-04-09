@@ -38,7 +38,7 @@
     "regenerator-runtime": "^0.13.1"
   },
   "engines": {
-    "node": "8.9.4"
+    "node": ">=8.9.4"
   },
   "bin": {
     "ctv": "./index.js"
