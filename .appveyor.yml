@@ -16,7 +16,7 @@ platform: x64
 install:
   - ps: Install-Product node 10 x64
   - appveyor-retry npm install
-  - npm run lint
+  #- npm run lint
 
 build: off
 
