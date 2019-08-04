@@ -21,7 +21,7 @@ const installVsix = (isInsiders, buildNum) => {
       info(`VSIXs to be downloaded : ${jsonData.length}`);
     }
 
-    for (const i in jsonData) {
+    for (let i = 0; i < jsonData.length; i++) {
       const vsixName = getVsixName(jsonData[i]);
       const optsDownload = buildVsixUrl(jsonData[i]);
 
