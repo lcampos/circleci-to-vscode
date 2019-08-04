@@ -4,8 +4,9 @@ const fs = require('fs');
 const fse = require('fs-extra');
 const path = require('path');
 const os = require('os');
-const { info, error } = require('./log');
+const { error } = require('./log');
 const { readConfigFile } = require('./configFile');
+const { vsixStats } = require('./vsixStats');
 
 // helper functions
 const ensureDirectoryExists = filePath => {
@@ -42,7 +43,7 @@ const installExtension = (originExtractPath, extensionName, isInsiders) => {
           overwrite: true
         })
         .then(() => {
-          info(`Successfully installed extension ${extensionName}`);
+          vsixStats.printStats(extensionName);
         })
         .catch(err => {
           error(`Error installing ${extensionName} : ${err}`);
@@ -51,6 +52,12 @@ const installExtension = (originExtractPath, extensionName, isInsiders) => {
     .catch(err => {
       error(err.message);
     });
+};
+
+const getFilesizeInMegabytes = filePath => {
+  const stats = fs.statSync(filePath);
+  const fileSizeInBytes = stats.size;
+  return fileSizeInBytes / 1000000.0;
 };
 
 module.exports = {
@@ -89,14 +96,16 @@ module.exports = {
 
   download: (fileName, optsDownload) => {
     return new Promise((resolve, reject) => {
+      const startTime = process.hrtime();
       const tmpFilePath = path.resolve(__dirname, `../tmp/${fileName}.zip`);
       ensureDirectoryExists(tmpFilePath);
       const file = fs.createWriteStream(tmpFilePath);
-
       const req = https.get(optsDownload, res => {
         res.pipe(file);
         file.on('finish', () => {
           file.close();
+          const hrend = process.hrtime(startTime);
+          vsixStats.add(fileName, { downloadTime: hrend });
           resolve([tmpFilePath, fileName]);
         });
       });
@@ -110,6 +119,8 @@ module.exports = {
   },
 
   extract: (filePath, fileName, isInsiders) => {
+    const extSize = getFilesizeInMegabytes(filePath);
+    vsixStats.add(fileName, { vsixSize: extSize });
     const zip = new admZip(filePath);
     const extractedFilePath = path.resolve(
       __dirname,

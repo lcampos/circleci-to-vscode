@@ -1,5 +1,4 @@
 const url = require('url');
-const { info } = require('./log');
 
 const buildHTTPOpts = (buildNum, config) => {
   // https://circleci.com/docs/2.0/artifacts/#downloading-all-artifacts-for-a-build-on-circleci
@@ -16,12 +15,9 @@ const buildHTTPOpts = (buildNum, config) => {
 };
 
 const getVsixName = data => {
-  const vsixName = data.path
+  return data.path
     .replace('home/circleci/project/extensions/', '')
     .replace('.vsix', '');
-
-  info(`Processing vsix : ${vsixName}`);
-  return vsixName;
 };
 
 const buildVsixUrl = data => {

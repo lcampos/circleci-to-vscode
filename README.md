@@ -60,6 +60,16 @@ Create a symlink to your locally cloned repo:
 $ npm link
 ```
 
+## Debugging
+
+The project ships with a VS Code debug configuration for Node.js. Open the project in VS Code and go to project file you want to debug. Set some breakpoints by clicking on the left side of the line where you’d like the code execution to stop, and in the terminal type:
+
+```
+$ node --inspect-brk <FILE NAME>
+Debugger listening on ws:127.0.0.1:9229/<UUID>
+```
+
+After this, go to the Debug section in VS Code and run the `Attach to Remote` configuration.
 
 ## Maintainers
 
