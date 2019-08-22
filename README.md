@@ -8,6 +8,14 @@
 ## Configuration
 After cloning this repo locally, create a `config.json` file based on the provided `sample-config.json` file and enter the info needed. This configuration is used to download the artifacts stored in circleci, more info about this in [Downloading All Artifacts for a Build on CircleCI](https://circleci.com/docs/2.0/artifacts/#downloading-all-artifacts-for-a-build-on-circleci).
 
+For installations from the salesforce-vscode project use the following values in your config.json:
+```
+"vcs_type": "github",
+"username": "forcedotcom",
+"project": "salesforcedx-vscode",
+"vscode_publisher": "salesforce"
+```
+
 Once this is set, install the cli tool globally by running:
 ```
 $ npm install -g
