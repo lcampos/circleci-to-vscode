@@ -18,30 +18,45 @@ const ensureDirectoryExists = filePath => {
   fs.mkdirSync(dirname);
 };
 
+const getVsixName = fileName => {
+  return fileName.replace('extensions/', '');
+};
+
 const installExtension = (originExtractPath, extensionName, isInsiders) => {
   const vscodeExtDirRoot = isInsiders
-    ? `${os.homedir()}/.vscode-insiders/extensions`
-    : `${os.homedir()}/.vscode/extensions`;
+    ? path.join(os.homedir(), '.vscode-insiders', 'extensions')
+    : path.join(os.homedir(), '.vscode', 'extensions');
   const publisher = readConfigFile().vscode_publisher;
-  const extensionInstallDir = `${vscodeExtDirRoot}/${publisher}.${extensionName}`;
+  const vsixName = getVsixName(extensionName);
+  const extensionInstallDir = path.join(
+    vscodeExtDirRoot,
+    `${publisher}.${vsixName}`
+  );
 
   // create new dir for extension to be installed
   ensureDirectoryExists(extensionInstallDir);
 
   // move extension from cli to vscode dirs
-  const originExtension = `${originExtractPath}/extension`;
+  const originExtension = path.join(originExtractPath, 'extension');
 
   // Move extension contents.
   fse
     .move(originExtension, extensionInstallDir, { overwrite: true })
     .then(() => {
       // Move extension manifest.
-      const originExtensionManifest = `${originExtractPath}/extension.vsixmanifest`;
+      const originExtensionManifest = path.join(
+        originExtractPath,
+        'extension.vsixmanifest'
+      );
 
       fse
-        .move(originExtensionManifest, extensionInstallDir + '/.vsixmanifest', {
-          overwrite: true
-        })
+        .move(
+          originExtensionManifest,
+          path.join(extensionInstallDir, '.vsixmanifest'),
+          {
+            overwrite: true
+          }
+        )
         .then(() => {
           vsixStats.printStats(extensionName);
         })
