@@ -7,6 +7,7 @@ const os = require('os');
 const { error } = require('./log');
 const { readConfigFile } = require('./configFile');
 const { vsixStats } = require('./vsixStats');
+const shell = require('shelljs');
 
 // helper functions
 const ensureDirectoryExists = filePath => {
@@ -109,28 +110,26 @@ module.exports = {
     }); //end Promise
   },
 
-  download: (fileName, optsDownload) => {
-    return new Promise((resolve, reject) => {
-      const startTime = process.hrtime();
-      const tmpFilePath = path.resolve(__dirname, `../tmp/${fileName}.zip`);
-      ensureDirectoryExists(tmpFilePath);
-      const file = fs.createWriteStream(tmpFilePath);
-      const req = https.get(optsDownload, res => {
-        res.pipe(file);
-        file.on('finish', () => {
-          file.close();
-          const hrend = process.hrtime(startTime);
-          vsixStats.add(fileName, { downloadTime: hrend });
-          resolve([tmpFilePath, fileName]);
-        });
-      });
+  download: (fileName, artifactURL) => {
+    const startTime = process.hrtime();
+    const tmpFilePath = path.resolve(__dirname, `../tmp/${fileName}.zip`);
+    ensureDirectoryExists(tmpFilePath);
+    // Download vsix files, fail if it takes more than 30 seconds to connect or if the download exceeds 2 mins
+    const curlResult = shell.exec(
+      `curl -L --fail ${artifactURL} --output ${tmpFilePath} --connect-timeout 30 --max-time 180`
+    );
+    if (curlResult.code !== 0) {
+      const errorMsgIndex = curlResult.stderr.indexOf('curl:');
+      if (errorMsgIndex > 0) {
+        throw new Error(curlResult.stderr.substring(errorMsgIndex));
+      }
 
-      req.on('error', e => {
-        error(`Error on vsix download : ${e.message}`);
-        reject('problems downloading a vsix');
-      });
-      req.end();
-    }); //end Promise
+      throw new Error(curlResult.stderr);
+    }
+
+    const hrend = process.hrtime(startTime);
+    vsixStats.add(fileName, { downloadTime: hrend });
+    return [tmpFilePath, fileName];
   },
 
   extract: (filePath, fileName, isInsiders) => {

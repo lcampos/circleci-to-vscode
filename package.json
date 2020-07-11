@@ -1,6 +1,6 @@
 {
   "name": "circleci-to-vscode",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Download artifacts from circle ci and install them as vscode extensions",
   "main": "index.js",
   "scripts": {
@@ -28,7 +28,8 @@
     "adm-zip": "^0.4.11",
     "chalk": "^2.4.1",
     "commander": "^2.17.1",
-    "fs-extra": "^7.0.0"
+    "fs-extra": "^7.0.0",
+    "shelljs": "0.8.3"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",

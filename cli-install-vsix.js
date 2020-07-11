@@ -1,7 +1,6 @@
 const { extract, download, httpsGet } = require('./utils/reqmod');
 const {
   buildHTTPOpts,
-  buildVsixUrl,
   getVsixName
 } = require('./utils/circleci');
 const { info, error } = require('./utils/log');
@@ -22,16 +21,15 @@ const installVsix = (isInsiders, buildNum) => {
     }
 
     for (let i = 0; i < jsonData.length; i++) {
-      const vsixName = getVsixName(jsonData[i]);
-      const optsDownload = buildVsixUrl(jsonData[i]);
+      try {
+        const vsixName = getVsixName(jsonData[i]);
+        const downloadURL = jsonData[i].url;
+        const dwn = download(vsixName, downloadURL);
+        extract(dwn[0], dwn[1], isInsiders);
+      } catch (e) {
+        error(e.message);
+      }
 
-      download(vsixName, optsDownload)
-        .then(resultArray => {
-          extract(resultArray[0], resultArray[1], isInsiders);
-        })
-        .catch(err => {
-          error(err.message);
-        });
     }
   });
 };
