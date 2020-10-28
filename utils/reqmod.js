@@ -116,7 +116,7 @@ module.exports = {
     ensureDirectoryExists(tmpFilePath);
     // Download vsix files, fail if it takes more than 30 seconds to connect or if the download exceeds 2 mins
     const curlResult = shell.exec(
-      `curl -L --fail ${artifactURL} --output ${tmpFilePath} --connect-timeout 30 --max-time 180`
+      `curl -L --fail ${artifactURL} --output "${tmpFilePath}" --connect-timeout 30 --max-time 180`
     );
     if (curlResult.code !== 0) {
       const errorMsgIndex = curlResult.stderr.indexOf('curl:');
