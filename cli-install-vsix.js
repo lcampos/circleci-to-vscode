@@ -5,14 +5,25 @@ const {
 } = require('./utils/circleci');
 const { info, error } = require('./utils/log');
 const { configExists, readConfigFile } = require('./utils/configFile');
+const { parsePullRequestNumber, fetchBuildNumFromPR } = require('./utils/github');
 
-const installVsix = (isInsiders, buildNum) => {
+const installVsix = (isInsiders, target) => {
   if (!configExists()) {
     error('The cli is not properly configured. Try running $ctv setup --help');
     process.exit(1);
   }
-
   const cliConfig = readConfigFile();
+  const prNum = parsePullRequestNumber(target, cliConfig);
+  if (prNum) {
+    fetchBuildNumFromPR(prNum, cliConfig)
+      .then(buildNum => getArtifactsAndInstall(buildNum, cliConfig, isInsiders))
+      .catch((err) => error(err));
+  } else {
+    getArtifactsAndInstall(target, cliConfig, isInsiders);
+  }
+};
+
+const getArtifactsAndInstall = (buildNum, cliConfig, isInsiders) => {
   const opts = buildHTTPOpts(buildNum, cliConfig);
 
   httpsGet(opts).then(jsonData => {
